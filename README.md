@@ -18,7 +18,7 @@ The Unity Reacher environment is provided by [this](https://github.com/Unity-Tec
 The specific environment that is in use in this project is the Unity [Reacher](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#reacher) environment.
 
 ### Installation Instructions
- - Install dependencies on top of python3
+ - Install dependencies on top of python3.6.8 (the version on DSMLP server)
  ```bash
  pip3 install -r requirements.txt
  ```
