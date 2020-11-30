@@ -22,5 +22,5 @@ The specific environment that is in use in this project is the Unity [Reacher](h
  ```bash
  pip3 install -r requirements.txt
  ```
-  - Follow env installation instructions as given in the <b>Getting Started</b> section in problem 2 [README](./rnld_repo/p2-continuous-control/README.md).
-  Ensure that when on server, follow the instruction marked (for AWS) to download the env without visualization in [this](rnld_repo/p2-continuous-control) directory
+  - Follow env installation instructions as given in the <b>Getting Started</b> section in problem 2 [README](./rnld_folder/p2-continuous-control/README.md).
+  Ensure that when on server, follow the instruction marked (for AWS) to download the env without visualization in [this](rnld_folder/p2-continuous-control) directory
