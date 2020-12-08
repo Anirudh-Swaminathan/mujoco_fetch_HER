@@ -27,9 +27,16 @@ class ddpg_agent:
         # build up the target network
         self.actor_target_network = actor(env_params)
         self.critic_target_network = critic(env_params)
+        # if I want to pretrain
+        if self.args.pretrain != '':
+            # list: self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, state_dict 
+            net_config_list = torch.load(self.args.pretrain)
+            self.actor_network.load_state_dict(net_config_list[-1])
+            self.actor_network.train()
         # load the weights into the target networks
         self.actor_target_network.load_state_dict(self.actor_network.state_dict())
         self.critic_target_network.load_state_dict(self.critic_network.state_dict())
+
         # if use gpu
         if self.args.cuda:
             self.actor_network.cuda()
