@@ -1,0 +1,4 @@
+Exp 000
+
+All baseline models with default arguments, no change.
+10 cycles, 20 epochs, 1 process

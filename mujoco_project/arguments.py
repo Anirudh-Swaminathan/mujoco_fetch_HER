@@ -36,6 +36,8 @@ def get_args():
     parser.add_argument('--num-rollouts-per-mpi', type=int, default=2, help='the rollouts per mpi')
     # Add argument for whether the model is to load pre-trained weights
     parser.add_argument('--pretrain', type=str, default='', help='the path to load the pretrained model from. Defaults to no pretraining')
+    # Add arguent for saving training curve
+    parser.add_argument('--save-curve', type=str, default='', help='the folder to save the training curve to. Defaults to only showing the curve')
 
     args = parser.parse_args()
 

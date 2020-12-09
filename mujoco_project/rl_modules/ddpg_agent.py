@@ -8,6 +8,7 @@ from rl_modules.replay_buffer import replay_buffer
 from rl_modules.models import actor, critic
 from mpi_utils.normalizer import normalizer
 from her_modules.her import her_sampler
+from matplotlib import pyplot as plt
 
 """
 ddpg with HER (MPI-version)
@@ -29,10 +30,13 @@ class ddpg_agent:
         self.critic_target_network = critic(env_params)
         # if I want to pretrain
         if self.args.pretrain != '':
+            print("Loading pre-trained network from {}".format(self.args.pretrain))
             # list: self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, state_dict 
             net_config_list = torch.load(self.args.pretrain)
             self.actor_network.load_state_dict(net_config_list[-1])
             self.actor_network.train()
+        else:
+            print("Training network from scratch!")
         # load the weights into the target networks
         self.actor_target_network.load_state_dict(self.actor_network.state_dict())
         self.critic_target_network.load_state_dict(self.critic_network.state_dict())
@@ -67,6 +71,10 @@ class ddpg_agent:
         train the network
 
         """
+        # Code to store and plot training curves
+        succs = list()
+        avg_succs = list()
+        print(self.args)
         # start to collect samples
         for epoch in range(self.args.n_epochs):
             for _ in range(self.args.n_cycles):
@@ -119,10 +127,52 @@ class ddpg_agent:
                 self._soft_update_target_network(self.critic_target_network, self.critic_network)
             # start to do the evaluation
             success_rate = self._eval_agent()
+            # Append the success rate for plotting purposes
+            succs.append(success_rate)
+            avg_succs.append(float(sum(succs) / len(succs)))
             if MPI.COMM_WORLD.Get_rank() == 0:
                 print('[{}] epoch is: {}, eval success rate is: {:.3f}'.format(datetime.now(), epoch, success_rate))
                 torch.save([self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, self.actor_network.state_dict()], \
                             self.model_path + '/model.pt')
+        # plot the curves
+        fig = plt.figure()
+        plt.plot(np.arange(self.args.n_epochs), succs)
+        # plt.plot(np.arange(self.args.n_epochs), avg_succs, 'b-.')
+        plt.xlim(0, self.args.n_epochs+1)
+        plt.ylim(0.0, 1.1)
+        plt.xlabel("Epoch")
+        plt.ylabel("Success Rate")
+        plt.title("{} success rate per epoch".format(self.env.unwrapped.spec.id))
+        if self.args.save_curve != '':
+            plt.savefig("{}/{}_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+        else:
+            plt.show()
+        # Plot/save the smoothed version
+        fig = plt.figure()
+        # plt.plot(np.arange(self.args.n_epochs), succs)
+        plt.plot(np.arange(self.args.n_epochs), avg_succs)
+        plt.ylim(0.0, 1.1)
+        plt.xlabel("Epoch")
+        plt.ylabel("Smoothed Success Rate")
+        plt.title("{} smoothed success rate per epoch".format(self.env.unwrapped.spec.id))
+        if self.args.save_curve != '':
+            plt.savefig("{}/{}_sm_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+        else:
+            plt.show() 
+
+        # Plot/save both overlayed 
+        fig = plt.figure()
+        plt.plot(np.arange(self.args.n_epochs), succs, 'b-')
+        plt.plot(np.arange(self.args.n_epochs), avg_succs, 'b-.')
+        plt.ylim(0.0, 1.1)
+        plt.xlabel("Epoch")
+        plt.ylabel("Success Rate")
+        plt.legend(['Success Rate', 'Smoothed Success Rate'])
+        plt.title("{} success rate per epoch".format(self.env.unwrapped.spec.id))
+        if self.args.save_curve != '':
+            plt.savefig("{}/{}_b_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+        else:
+            plt.show() 
 
     # pre_process the inputs
     def _preproc_inputs(self, obs, g):
