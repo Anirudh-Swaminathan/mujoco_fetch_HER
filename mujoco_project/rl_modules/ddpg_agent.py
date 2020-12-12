@@ -31,14 +31,21 @@ class ddpg_agent:
         # if I want to pretrain
         if self.args.pretrain != '':
             print("Loading pre-trained network from {}".format(self.args.pretrain))
-            # list: self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, state_dict 
+            # list: self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, actor_network state_dict,
+            #       actor_target_network state_dict, critic_network state_dict, critic_target_network state_dict 
             net_config_list = torch.load(self.args.pretrain)
-            self.actor_network.load_state_dict(net_config_list[-1])
+            self.actor_network.load_state_dict(net_config_list[4])
             self.actor_network.train()
+            self.actor_target_network.load_state_dict(net_config_list[5])
+            self.actor_target_network.train()
+            #self.critic_network.load_state_dict(net_config_list[6])
+            #self.critic_network.train()
+            #self.critic_target_network.load_state_dict(net_config_list[7])
+            #self.critic_target_network.train()
         else:
             print("Training network from scratch!")
         # load the weights into the target networks
-        self.actor_target_network.load_state_dict(self.actor_network.state_dict())
+        #self.actor_target_network.load_state_dict(self.actor_network.state_dict())
         self.critic_target_network.load_state_dict(self.critic_network.state_dict())
 
         # if use gpu
@@ -132,8 +139,9 @@ class ddpg_agent:
             avg_succs.append(float(sum(succs) / len(succs)))
             if MPI.COMM_WORLD.Get_rank() == 0:
                 print('[{}] epoch is: {}, eval success rate is: {:.3f}'.format(datetime.now(), epoch, success_rate))
-                torch.save([self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, self.actor_network.state_dict()], \
-                            self.model_path + '/model.pt')
+                torch.save([self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, self.actor_network.state_dict(), \
+                            self.actor_target_network.state_dict(), self.critic_network.state_dict(), self.critic_target_network.state_dict()] \
+                            , self.model_path + '/model.pt')
         # plot the curves
         fig = plt.figure()
         plt.plot(np.arange(self.args.n_epochs), succs)
