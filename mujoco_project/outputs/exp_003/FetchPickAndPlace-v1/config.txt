@@ -1,0 +1,14 @@
+All envs trained on FetchPush-v1 baseline model
+
+Load actor network weights onto actor network only. Load critic network weights onto critic network only.
+FetchPickAndPlace-v1 parameters:-
+ - np 8
+ - env-name='FetchPickAndPlace-v1'
+ - n-epochs=50(def)
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_003/'
+ - batch-size=256(def)
+ - cuda=True
+ - pretrain='./outputs/exp_000/FetchPush-v1/model.pt'
+ - save-curve='./plots/exp_003/FetchPickAndPlace-v1'
+ - n-batches=40

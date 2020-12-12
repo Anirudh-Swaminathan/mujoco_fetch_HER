@@ -1,0 +1,2 @@
+All envs trained on FetchPush-v1 baseline model
+Please see mujoco-py/outputs/exp_002/<env-name> for exact config

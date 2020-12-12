@@ -1,3 +1,1 @@
-All baseline models with default arguments, no change.
-FetchReachv1 - 10 cycles, 20 epochs, 1 process
-FetchPushv1 - 50 cycles, 50 epochs, 20 batches, 4 processes
+See exp_000 baseline config specs in outputs/exp_000/<env-name>

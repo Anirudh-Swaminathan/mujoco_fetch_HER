@@ -1,0 +1,14 @@
+All envs trained on FetchPush-v1 baseline model
+
+Load each model using its own saved baseline weights (actor network, actor target, critic network, critic target).
+FetchPickAndPlace-v1 parameters:-
+ - np 8
+ - env-name='FetchPickAndPlace-v1'
+ - n-epochs=50(def)
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_006/'
+ - batch-size=256(def)
+ - cuda=True
+ - pretrain='./outputs/exp_000/FetchPush-v1/model.pt'
+ - save-curve='./plots/exp_006/FetchPickAndPlace-v1'
+ - n-batches=40

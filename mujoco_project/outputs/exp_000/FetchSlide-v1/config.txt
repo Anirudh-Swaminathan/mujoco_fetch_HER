@@ -1,0 +1,13 @@
+Baseline Config: No pretrained models
+
+Load both actor and actor target.
+FetchSlide-v1 parameters:-
+ - np 8
+ - env-name='FetchSlide-v1'
+ - n-epochs=75
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_000/'
+ - batch-size=256(def)
+ - cuda=True
+ - save-curve='./plots/exp_000/FetchSlide-v1'
+ - n-batches=40(def)

@@ -1,14 +1,2 @@
 All envs trained on FetchPush-v1 baseline model
-
-Load both actor and actor target.
-FetchSlide-v1 parameters:-
- - np 4
- - env-name='FetchSlide-v1'
- - n-epochs=50(def)
- - n-cycles=50(def)
- - save-dir='./outputs/exp_001/'
- - batch-size=256(def)
- - cuda=True
- - pretrain='./saved_baselines/FetchPush-v1/model.pt'
- - save-curve='./plots/exp_001/FetchSlide-v1'
- - n-batches=20
+Please see mujoco-py/outputs/exp_001/<env-name> for exact config

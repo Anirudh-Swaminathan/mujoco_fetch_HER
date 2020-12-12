@@ -1,0 +1,14 @@
+All envs trained on FetchPush-v1 baseline model
+
+Load each model using its own saved baseline weights (actor network, actor target, critic network, critic target).
+FetchSlide-v1 parameters:-
+ - np 8
+ - env-name='FetchSlide-v1'
+ - n-epochs=75
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_006/'
+ - batch-size=256(def)
+ - cuda=True
+ - pretrain='./outputs/exp_000/FetchPush-v1/model.pt'
+ - save-curve='./plots/exp_006/FetchSlide-v1'
+ - n-batches=40
