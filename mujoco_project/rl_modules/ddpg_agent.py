@@ -40,15 +40,15 @@ class ddpg_agent:
             self.actor_network.train()
             self.actor_target_network.load_state_dict(net_config_list[5])
             self.actor_target_network.train()
-            # self.critic_network.load_state_dict(net_config_list[6])
-            # self.critic_network.train()
-            # self.critic_target_network.load_state_dict(net_config_list[7])
-            # self.critic_target_network.train()
+            self.critic_network.load_state_dict(net_config_list[6])
+            self.critic_network.train()
+            self.critic_target_network.load_state_dict(net_config_list[7])
+            self.critic_target_network.train()
         else:
             print("Training network from scratch!")
         # load the weights into the target networks
         # self.actor_target_network.load_state_dict(self.actor_network.state_dict())
-        self.critic_target_network.load_state_dict(self.critic_network.state_dict())
+        # self.critic_target_network.load_state_dict(self.critic_network.state_dict())
 
         # if use gpu
         if self.args.cuda:
