@@ -35,9 +35,13 @@ def get_args():
     parser.add_argument('--cuda', action='store_true', help='if use gpu do the acceleration')
     parser.add_argument('--num-rollouts-per-mpi', type=int, default=2, help='the rollouts per mpi')
     # Add argument for whether the model is to load pre-trained weights
-    parser.add_argument('--pretrain', type=str, default='', help='the path to load the pretrained model from. Defaults to no pretraining')
+    parser.add_argument('--pretrain', type=str, default='',
+                        help='the path to load the pretrained model from. Defaults to no pretraining')
     # Add arguent for saving training curve
-    parser.add_argument('--save-curve', type=str, default='', help='the folder to save the training curve to. Defaults to only showing the curve')
+    parser.add_argument('--save-curve', type=str, default='',
+                        help='the folder to save the training curve to. Defaults to only showing the curve')
+    # arguments for loading the buffer at initialization. Defaults to no loading
+    parser.add_argument('--load-buffer', type=str, default='', help='.npy file of buffer to load from')
 
     args = parser.parse_args()
 

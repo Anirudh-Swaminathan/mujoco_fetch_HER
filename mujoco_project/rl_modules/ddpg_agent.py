@@ -14,6 +14,8 @@ from matplotlib import pyplot as plt
 ddpg with HER (MPI-version)
 
 """
+
+
 class ddpg_agent:
     def __init__(self, args, env, env_params):
         self.args = args
@@ -38,14 +40,14 @@ class ddpg_agent:
             self.actor_network.train()
             self.actor_target_network.load_state_dict(net_config_list[5])
             self.actor_target_network.train()
-            #self.critic_network.load_state_dict(net_config_list[6])
-            #self.critic_network.train()
-            #self.critic_target_network.load_state_dict(net_config_list[7])
-            #self.critic_target_network.train()
+            # self.critic_network.load_state_dict(net_config_list[6])
+            # self.critic_network.train()
+            # self.critic_target_network.load_state_dict(net_config_list[7])
+            # self.critic_target_network.train()
         else:
             print("Training network from scratch!")
         # load the weights into the target networks
-        #self.actor_target_network.load_state_dict(self.actor_network.state_dict())
+        # self.actor_target_network.load_state_dict(self.actor_network.state_dict())
         self.critic_target_network.load_state_dict(self.critic_network.state_dict())
 
         # if use gpu
@@ -60,7 +62,9 @@ class ddpg_agent:
         # her sampler
         self.her_module = her_sampler(self.args.replay_strategy, self.args.replay_k, self.env.compute_reward)
         # create the replay buffer
-        self.buffer = replay_buffer(self.env_params, self.args.buffer_size, self.her_module.sample_her_transitions)
+        # add the buffer path to load 50% of the buffer from
+        self.buffer = replay_buffer(self.env_params, self.args.buffer_size, self.her_module.sample_her_transitions,
+                                    self.args.load_buffer)
         # create the normalizer
         self.o_norm = normalizer(size=env_params['obs'], default_clip_range=self.args.clip_range)
         self.g_norm = normalizer(size=env_params['goal'], default_clip_range=self.args.clip_range)
@@ -139,20 +143,23 @@ class ddpg_agent:
             avg_succs.append(float(sum(succs) / len(succs)))
             if MPI.COMM_WORLD.Get_rank() == 0:
                 print('[{}] epoch is: {}, eval success rate is: {:.3f}'.format(datetime.now(), epoch, success_rate))
-                torch.save([self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std, self.actor_network.state_dict(), \
-                            self.actor_target_network.state_dict(), self.critic_network.state_dict(), self.critic_target_network.state_dict()] \
-                            , self.model_path + '/model.pt')
+                torch.save([self.o_norm.mean, self.o_norm.std, self.g_norm.mean, self.g_norm.std,
+                            self.actor_network.state_dict(),
+                            self.actor_target_network.state_dict(), self.critic_network.state_dict(),
+                            self.critic_target_network.state_dict()],
+                           self.model_path + '/model.pt')
         # plot the curves
         fig = plt.figure()
         plt.plot(np.arange(self.args.n_epochs), succs)
         # plt.plot(np.arange(self.args.n_epochs), avg_succs, 'b-.')
-        plt.xlim(0, self.args.n_epochs+1)
+        plt.xlim(0, self.args.n_epochs + 1)
         plt.ylim(0.0, 1.1)
         plt.xlabel("Epoch")
         plt.ylabel("Success Rate")
         plt.title("{} success rate per epoch".format(self.env.unwrapped.spec.id))
         if self.args.save_curve != '':
-            plt.savefig("{}/{}_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+            plt.savefig("{}/{}_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id),
+                        bbox_inches="tight")
         else:
             plt.show()
         # Plot/save the smoothed version
@@ -164,11 +171,12 @@ class ddpg_agent:
         plt.ylabel("Smoothed Success Rate")
         plt.title("{} smoothed success rate per epoch".format(self.env.unwrapped.spec.id))
         if self.args.save_curve != '':
-            plt.savefig("{}/{}_sm_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+            plt.savefig("{}/{}_sm_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id),
+                        bbox_inches="tight")
         else:
-            plt.show() 
+            plt.show()
 
-        # Plot/save both overlayed 
+        # Plot/save both overlayed
         fig = plt.figure()
         plt.plot(np.arange(self.args.n_epochs), succs, 'b-')
         plt.plot(np.arange(self.args.n_epochs), avg_succs, 'b-.')
@@ -178,9 +186,13 @@ class ddpg_agent:
         plt.legend(['Success Rate', 'Smoothed Success Rate'])
         plt.title("{} success rate per epoch".format(self.env.unwrapped.spec.id))
         if self.args.save_curve != '':
-            plt.savefig("{}/{}_b_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id), bbox_inches="tight")
+            plt.savefig("{}/{}_b_training.png".format(self.args.save_curve, self.env.unwrapped.spec.id),
+                        bbox_inches="tight")
         else:
-            plt.show() 
+            plt.show()
+
+        # save the replay buffer useful for other training stuff
+        self.buffer.save_buffer(path=self.model_path + '/buffer.npy')
 
     # pre_process the inputs
     def _preproc_inputs(self, obs, g):
@@ -192,7 +204,7 @@ class ddpg_agent:
         if self.args.cuda:
             inputs = inputs.cuda()
         return inputs
-    
+
     # this function will choose action for the agent and do the exploration
     def _select_actions(self, pi):
         action = pi.cpu().numpy().squeeze()
@@ -201,7 +213,7 @@ class ddpg_agent:
         action = np.clip(action, -self.env_params['action_max'], self.env_params['action_max'])
         # random actions...
         random_actions = np.random.uniform(low=-self.env_params['action_max'], high=self.env_params['action_max'], \
-                                            size=self.env_params['action'])
+                                           size=self.env_params['action'])
         # choose if use the random actions
         action += np.random.binomial(1, self.args.random_eps, 1)[0] * (random_actions - action)
         return action
@@ -214,10 +226,10 @@ class ddpg_agent:
         # get the number of normalization transitions
         num_transitions = mb_actions.shape[1]
         # create the new buffer to store them
-        buffer_temp = {'obs': mb_obs, 
+        buffer_temp = {'obs': mb_obs,
                        'ag': mb_ag,
-                       'g': mb_g, 
-                       'actions': mb_actions, 
+                       'g': mb_g,
+                       'actions': mb_actions,
                        'obs_next': mb_obs_next,
                        'ag_next': mb_ag_next,
                        }
@@ -261,7 +273,7 @@ class ddpg_agent:
         inputs_norm_tensor = torch.tensor(inputs_norm, dtype=torch.float32)
         inputs_next_norm_tensor = torch.tensor(inputs_next_norm, dtype=torch.float32)
         actions_tensor = torch.tensor(transitions['actions'], dtype=torch.float32)
-        r_tensor = torch.tensor(transitions['r'], dtype=torch.float32) 
+        r_tensor = torch.tensor(transitions['r'], dtype=torch.float32)
         if self.args.cuda:
             inputs_norm_tensor = inputs_norm_tensor.cuda()
             inputs_next_norm_tensor = inputs_next_norm_tensor.cuda()
