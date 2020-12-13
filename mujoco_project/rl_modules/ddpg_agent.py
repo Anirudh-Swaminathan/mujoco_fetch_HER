@@ -201,7 +201,7 @@ class ddpg_agent:
         print('Max Success Rate: {}'.format(np.max(succs)))
 
         # save the replay buffer useful for other training stuff
-        self.buffer.save_buffer(path=self.model_path + '/buffer.npy')
+        self.buffer.save_buffer(path=self.model_path + '/buffer_{}.npy'.format(self.env.unwrapped.spec.id))
 
     # pre_process the inputs
     def _preproc_inputs(self, obs, g):

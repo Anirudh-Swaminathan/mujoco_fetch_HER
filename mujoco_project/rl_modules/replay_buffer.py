@@ -23,8 +23,10 @@ class replay_buffer:
                         'actions': np.empty([self.size, self.T, self.env_params['action']]),
                         }
         if load_path != '':
-            self._preload_buffer(load_path)
-            print("Pre-loaded buffer successfully from {}".format(load_path))
+            # self._preload_buffer(load_path)
+            self._copy_buffer(load_path)
+            # print("Pre-loaded buffer successfully from {}".format(load_path))
+            print("Copied buffer successfully from {}".format(load_path))
         # thread lock
         self.lock = threading.Lock()
 
@@ -74,7 +76,28 @@ class replay_buffer:
         Method to save the buffer
         :params: path - string path of .npy file to save the buffer to
         """
+        self.buffers["cs"] = self.current_size
+        self.buffers["nt"] = self.n_transitions_stored
         np.save(path, self.buffers)
+
+    def _copy_buffer(self, path: str):
+        """
+        Method to copy buffer from save path
+        :params: path - string path of .npy file to load buffer from
+        """
+        # saved_obj is numpy array with only one dictionary
+        saved_obj = np.load(path, allow_pickle=True)
+        # copy complete buffers dictionary
+        stored_data = saved_obj[()]
+        self.buffers["obs"] = np.copy(stored_data["obs"])
+        self.buffers["ag"] = np.copy(stored_data["ag"])
+        self.buffers["g"] = np.copy(stored_data["g"])
+        self.buffers["actions"] = np.copy(stored_data["actions"])
+
+        # set the index used in accessing the buffer
+        # initially, number of transitions stored equals the current size of the buffer
+        self.current_size = stored_data["cs"]
+        self.n_transitions_stored = stored_data["nt"]
 
     def _preload_buffer(self, path: str):
         """
