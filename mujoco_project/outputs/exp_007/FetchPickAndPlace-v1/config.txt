@@ -1,0 +1,19 @@
+--- Chaining Experiments ---
+
+Load each model using its own saved baseline weights (actor network, actor target, critic network, critic target).
+
+1. Load FetchPush-v1 model and train FetchSlide-v1 (exp_006)
+2. Load the outcome of step 1 into FetchPickAndPlace-v1
+
+
+FetchPickAndPlace-v1 parameters:-
+ - np 8
+ - env-name='FetchPickAndPlace-v1'
+ - n-epochs=50(def)
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_007/'
+ - batch-size=256(def)
+ - cuda=True
+ - pretrain='./outputs/exp_006/FetchSlide-v1/model.pt'
+ - save-curve='./plots/exp_007/FetchPickAndPlace-v1'
+ - n-batches=40
