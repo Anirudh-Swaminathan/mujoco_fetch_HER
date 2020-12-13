@@ -82,7 +82,7 @@ class replay_buffer:
         :params: path - string path of .npy file to load buffer from
         """
         # saved_obj is numpy array with only one dictionary
-        saved_obj = np.load(path)
+        saved_obj = np.load(path, allow_pickle=True)
         # copy complete buffers dictionary
         self.buffers = saved_obj[()]
         buff_size, times, obs_size = self.buffers['obs'].shape
