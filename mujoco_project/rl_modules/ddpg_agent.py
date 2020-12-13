@@ -191,6 +191,15 @@ class ddpg_agent:
         else:
             plt.show()
 
+        # save avg succ vals, last 10 epochs avg succ vals, and max succ vals
+        print('Average Total Success Rate: {}'.format(np.mean(succs)))
+        num_e = len(succs)
+        if (num_e <= 10):
+            print('Average Success Rate Last {} Epochs: {}'.format(num_e, np.mean(np.asarray(succs)[-num_e:])))
+        else:
+            print('Average Success Rate Last 10 Epochs: {}'.format(np.mean(np.asarray(succs)[-10:])))
+        print('Max Success Rate: {}'.format(np.max(succs)))
+
         # save the replay buffer useful for other training stuff
         self.buffer.save_buffer(path=self.model_path + '/buffer.npy')
 
