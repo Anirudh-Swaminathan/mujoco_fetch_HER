@@ -1,0 +1,15 @@
+--- Buffer Experiments ---
+
+1. Load FetchPush-v1 (exp_000) baseline buffer (not model) and train FetchPickAndPlace-v1 
+
+FetchPickAndPlace-v1 parameters:-
+ - np 8
+ - env-name='FetchPickAndPlace-v1'
+ - n-epochs=50(def)
+ - n-cycles=50(def)
+ - save-dir='./outputs/exp_008/'
+ - batch-size=256(def)
+ - cuda=True
+ - save-curve='./plots/exp_008/FetchPickAndPlace-v1'
+ - load-buffer='./outputs/exp_000/FetchPush-v1/buffer.npy'
+ - n-batches=40
